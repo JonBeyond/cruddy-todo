@@ -38,13 +38,26 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+exports.getNextUniqueId = (callback) => {
+  var postReadCallback = (err, data) => {
+      if (err) {
+        console.log('error in postreadcallback')
+      } else {
+        writeCounter(data+1, (err, counterString) => {
+          if (err) {
+            console.log('error in writeCounter');
+          } else {
+            callback(null, counterString);
+          }
+        });
+      }
+  };
+
+  readCounter(postReadCallback);
 };
 
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
-exports.counterFile = path.join(__dirname, 'counter.txt');
+exports.counterFile = path.join(__dirname, 'counter.txt'); // './counter.txt'/
