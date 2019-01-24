@@ -19,7 +19,8 @@ $(() => {
   };
 
   var changeTodo = (id, todo) => {
-    $(`#todos [data-id=${id}]`).replaceWith(renderTodo(todo));
+    var todoObj = { id, text: todo };
+    $(`#todos [data-id=${id}]`).replaceWith(renderTodo(todoObj));
   };
 
   var removeTodo = (id) => {

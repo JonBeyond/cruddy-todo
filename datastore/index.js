@@ -16,7 +16,7 @@ exports.create = (text, callback) => {
       //console.log('Target file is: ' + targetFile);
       fs.writeFile(targetFile, text, (err) => {
         if (err) {
-          console.log("error writing file");
+          console.log('error writing file');
         } else {
           callback(null, { id, text });
         }
@@ -50,12 +50,12 @@ exports.readOne = (id, callback) => {
   //         with the read info
   let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
   fs.readFile(targetFile, 'utf8', (err, fileData) => {
-    if (err){
+    if (err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
       callback(null, { id, text: fileData });
     }
-  })
+  });
 };
 
 exports.update = (id, newText, callback) => {
@@ -63,7 +63,6 @@ exports.update = (id, newText, callback) => {
   //-> if that responds with err, then it doesnt (stop, throw away EVERYHITNG)
   //-> if it is the succ callback, then we continue
   let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
-
   fs.readFile(targetFile, 'utf8', (err, fileData) => {
     if (err) {
       console.log('todo requested does not exist');
@@ -76,7 +75,7 @@ exports.update = (id, newText, callback) => {
         } else {
           callback(null, newText);
         }
-      })
+      });
     }
   });
 };

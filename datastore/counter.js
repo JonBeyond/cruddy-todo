@@ -40,17 +40,17 @@ const writeCounter = (count, callback) => {
 
 exports.getNextUniqueId = (callback) => {
   var postReadCallback = (err, data) => {
-      if (err) {
-        console.log('error in postreadcallback')
-      } else {
-        writeCounter(data+1, (err, counterString) => {
-          if (err) {
-            console.log('error in writeCounter');
-          } else {
-            callback(null, counterString);
-          }
-        });
-      }
+    if (err) {
+      console.log('error in postreadcallback');
+    } else {
+      writeCounter(data + 1, (err, counterString) => {
+        if (err) {
+          console.log('error in writeCounter');
+        } else {
+          callback(null, counterString);
+        }
+      });
+    }
   };
 
   readCounter(postReadCallback);
