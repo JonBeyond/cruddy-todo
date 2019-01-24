@@ -27,20 +27,58 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  fs.readdir(exports.dataDir, (err, files) => {
-    if (err) {
-      console.log('error reading directory');
-    } else {
-      // console.log('files: ', files);
-      // maps array of filenames into array of objects containing id and text
-      let filez = files.map(file => {
-        let replacedString = file.replace(/.txt/gi, '');
-        return {id: replacedString, text: replacedString};
+  var allPromises = new Promise((resolve, reject) => {
+    fs.readdir(exports.dataDir, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(files);
+      }
+    });
+  }).then((files) => {
+    var filePromises = files.map((filename) => {
+      let id = filename.replace(/.txt/gi, '');
+      return new Promise((resolve, reject) => {
+        let targetFile = path.join(exports.dataDir, filename);
+        fs.readFile(targetFile, 'utf8', (err, text) => {
+          if (err) {
+            reject(err);
+          } else {
+            let todoObj = { text, id };
+            resolve(todoObj);
+          }
+        });
       });
-      // console.log('filez: ', filez);
-      callback(null, filez);
-    }
+    });
+    Promise.all(filePromises).then((todos) => {
+      console.log('REACH', todos);
+      callback(null, todos);
+    });
   });
+
+
+//   fs.readdir(exports.dataDir, (err, files) => {
+//     if (err) {
+//       console.log('error reading directory');
+//     } else {
+//       // console.log('files: ', files);
+//       // maps array of filenames into array of objects containing id and text
+
+//       //step1) create an array to store promises
+//       //step2) map each file and create a new promise that is pushed into the array
+//       //step3) use promise.all to resolve the object structure (???)
+
+
+//       let filez = files.map(file => {
+//         let replacedString = file.replace(/.txt/gi, '');
+// //fs.readFile using 'file'
+
+//         return {id: replacedString, text: replacedString};
+//       });
+//       // console.log('filez: ', filez);
+//       callback(null, filez);
+    // }
+  // });
 };
 
 exports.readOne = (id, callback) => {
