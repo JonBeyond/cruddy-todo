@@ -13,7 +13,7 @@ exports.create = (text, callback) => {
       console.log('error in create');
     } else {
       var targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
-      console.log('Target file is: ' + targetFile);
+      //console.log('Target file is: ' + targetFile);
       fs.writeFile(targetFile, text, (err) => {
         if (err) {
           console.log("error writing file");
@@ -27,10 +27,23 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
-  });
-  callback(null, data);
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      console.log('error reading directory');
+    } else {
+      console.log('files: ', files);
+      var filez = files.map(file => {
+        replacedString = file.replace(/.txt/gi, '');
+        return {id: replacedString, text: replacedString};
+      });
+      console.log('filez: ', filez);
+      callback(null, filez);
+    }
+  })
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
