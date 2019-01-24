@@ -53,31 +53,44 @@ exports.readOne = (id, callback) => {
     if (err){
       callback(new Error(`No item with id: ${id}`));
     } else {
-      
       callback(null, { id, text: fileData });
     }
   })
 };
 
-exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+exports.update = (id, newText, callback) => {
+  //check that the file exists
+  //-> if that responds with err, then it doesnt (stop, throw away EVERYHITNG)
+  //-> if it is the succ callback, then we continue
+  let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
+
+  fs.readFile(targetFile, 'utf8', (err, fileData) => {
+    if (err) {
+      console.log('todo requested does not exist');
+      callback(new Error('todo requested does not exist'), null);
+    } else {
+      fs.writeFile(targetFile, newText, (err) => {
+        if (err) {
+          console.log('file exists; but write failed');
+          callback(new Error('file exists; but write failed'), null);
+        } else {
+          callback(null, newText);
+        }
+      })
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
+  fs.unlink(targetFile, (err) => {
+    if (err) {
+      console.log('todo delete failed');
+      callback(new Error('todo delete failed'));
+    } else {
+      callback(null);
+    }
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
