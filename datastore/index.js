@@ -12,7 +12,7 @@ exports.create = (text, callback) => {
     if (err) {
       console.log('error in create');
     } else {
-      var targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
+      let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
       //console.log('Target file is: ' + targetFile);
       fs.writeFile(targetFile, text, (err) => {
         if (err) {
@@ -31,28 +31,32 @@ exports.readAll = (callback) => {
     if (err) {
       console.log('error reading directory');
     } else {
-      console.log('files: ', files);
-      var filez = files.map(file => {
-        replacedString = file.replace(/.txt/gi, '');
+      // console.log('files: ', files);
+      // maps array of filenames into array of objects containing id and text
+      let filez = files.map(file => {
+        let replacedString = file.replace(/.txt/gi, '');
         return {id: replacedString, text: replacedString};
       });
-      console.log('filez: ', filez);
+      // console.log('filez: ', filez);
       callback(null, filez);
     }
-  })
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
+  });
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  //strategy: read the file,
+  // err-> throw it away?
+  // succ -> simply use the callback (as below)
+  //         with the read info
+  let targetFile = path.join(exports.dataDir, id).concat('.txt'); //yay
+  fs.readFile(targetFile, 'utf8', (err, fileData) => {
+    if (err){
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      
+      callback(null, { id, text: fileData });
+    }
+  })
 };
 
 exports.update = (id, text, callback) => {
