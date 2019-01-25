@@ -15,49 +15,72 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-const readCounter = (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
-    if (err) {
-      callback(null, 0);
-    } else {
-      callback(null, Number(fileData));
-    }
+const readFileAsync = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, fileData) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(fileData);
+      }
+    });
   });
 };
 
-const writeCounter = (count, callback) => {
-  var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
-    if (err) {
-      throw ('error writing counter');
-    } else {
-      callback(null, counterString);
-    }
+const writeFileAsync = (path, text) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path, text, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ path: path, text: text });
+      }
+    });
+  });
+};
+
+const unlinkAsync = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(path, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
+const readdirAsync = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(path, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(files);
+      }
+    });
   });
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = (callback) => {
-  var postReadCallback = (err, data) => {
-    if (err) {
-      console.log('error in postreadcallback');
-    } else {
-      writeCounter(data + 1, (err, counterString) => {
-        if (err) {
-          console.log('error in writeCounter');
-        } else {
-          callback(null, counterString);
-        }
-      });
-    }
-  };
-
-  readCounter(postReadCallback);
+exports.getNextUniqueId = () => {
+  return readFileAsync(exports.counterFile)
+    .then((fileData) => {
+      let nextId = Number(fileData) + 1;
+      nextId = zeroPaddedNumber(nextId);
+      return writeFileAsync(exports.counterFile, nextId);
+    });
 };
+
 
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
 exports.counterFile = path.join(__dirname, 'counter.txt'); // './counter.txt'/
+exports.readFileAsync = readFileAsync;
+exports.writeFileAsync = writeFileAsync;
+exports.unlinkAsync = unlinkAsync;
+exports.readdirAsync = readdirAsync;
